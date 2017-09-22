@@ -1,0 +1,98 @@
+{% extends "admin/layout.nj" %}
+
+{% block content %}
+	<form action='/admin/edit' method='post' id='article'>
+		<input type='hidden' name='id' value='{{ articleModel.id }}'>
+		<input type='hidden' name='created_at' value='{{ articleModel.created_at }}'>
+
+		{# 文章信息头部 #}
+		<div class='edit-header'>
+			<h1>{{ title }}</h1>
+			<div class='input-wrapper category'>
+				<label for='type'>选择文章分类：</label>
+				<select name='type' id='type'>
+					{% for item in articleType %}
+						<option value='{{ item.id }}'>{{ item.name }}</option>
+					{% endfor %}
+					<option value='new'>新建</option>
+				</select>
+			</div>
+			<input type='text' placeholder='分类名称' class='hide input input-small new-type-input' name='newType'>
+		</div>
+
+		{# 文章基础信息 #}
+		<div class='edit-article-message'>
+			<div class='left'>
+				<div class='input-wrapper'>
+					<input type='text' placeholder='文章标题' name='title' class='input input-big title' value='{{ articleModel.title }}'>
+				</div>
+				<div class='input-wrapper'>
+					<input type='text' placeholder='文章标签，多个以“空格”分割' name='label' class='input input-big label' value='{{ articleModel.label }}'>
+				</div>
+				<div class='input-wrapper'>
+					<textarea placeholder='描述' rows='6' name='desc' class='input input-big'>{{ articleModel.desc }}</textarea>
+				</div>
+			</div>
+			<div class='right'>
+				<div class='upload-preview'>
+					<span>点击上传图片</span>
+				</div>
+				<input type='file' accept='image/jpeg, image/jpg, image/png' class='hide'>
+			</div>
+		</div>
+
+		{# 文章内容 #}
+		<div class='edit-article-content'>
+			<div id='editormd'>
+				<textarea style='display:none;'>{{ articleModel.content_md }}</textarea>
+			</div>
+		</div>
+
+		{# 文章操作按钮 #}
+		<div class='article-operate-btn'>
+			<input type='hidden' value='0' name='status' id='status'>
+			<button type='button' class='btn save'>暂存</button>
+			<button type='button' class='btn submit'>发布</button>
+		</div>
+	</form>
+{% endblock %}
+
+{% block style %}
+	<link rel='stylesheet' href='/lib/editormd/css/editormd.min.css'>
+{% endblock %}
+
+{% block script %}
+	<script src='/lib/editormd/editormd.min.js'></script>
+	<script>
+		$(function() {
+			// 初始化markdown编辑器
+			var editor = editormd('editormd', {
+				path : '/lib/editormd/lib/',
+				toolbarIcons : function() {
+					return ["undo", "redo", "|", "preview", "watch", "||", "fullscreen"]
+				},
+				watch: false,
+				saveHTMLToTextarea: true
+			});
+			// 新建文章分类
+			var newTypeEl = $('.new-type-input');
+			$('#type').change(function() {
+				var val = $(this).children('option:selected').val();
+				if (val === 'new') {
+					newTypeEl.fadeIn();
+				} else {
+					newTypeEl.fadeOut();
+				}
+			});
+			// 提交文章内容
+			$('.article-operate-btn button').click(function() {
+				// markdown
+				editor.getMarkdown();       // 获取 Markdown 源码
+				editor.getHTML();           // 获取 Textarea 保存的 HTML 源码
+				// 暂存 提交
+				$('#status').val($(this).hasClass('save') ? 0 : 1);
+				$('#article').submit();
+			});
+		});
+	</script>
+{% endblock %}

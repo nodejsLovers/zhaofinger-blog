@@ -1,0 +1,45 @@
+{% extends "app/layout.nj" %}
+
+{% block style %}
+	<link rel='stylesheet' href='/style/app/markdown.css'>
+	<link rel="stylesheet" href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css'>
+{% endblock %}
+
+{% block script %}
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+	<script>
+		hljs.initHighlightingOnLoad();
+	</script>
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+	<article id='detail'>
+		<header>
+			<h2 class='article-title'>{{ articleDetail.title }}</h2>
+			<div class='article-meta'>
+				<span>By</span>
+				<span class='author'>赵的拇指</span>
+				<span>At</span>
+				<span class='datetime'>{{ articleDetail.created_at }}</span>
+				<span>In</span>
+				<a href='/article/type/{{ articleDetail.type }}' class='category'>{{ articleDetail.type_name }}</a>
+			</div>
+		</header>
+		<div class='markdown-body'>
+			{{ articleDetail.content_render | safe }}
+		</div>
+		<ul class='article-label-list'>
+			<span class='label-title'>标签：</span>
+			{% for item in labelArr %}
+				<li>#{{ item }}</li>
+			{% endfor %}
+		</ul>
+		<div class='article-comment'>
+			<span class='comment-title'>评论：</span>
+			<span>暂未开发，有问题可以给我发邮件&nbsp;&nbsp;<a href='mailto:zhbqsj@126.com'>zhbqsj@126.com</span>
+		</div>
+	</article>
+{% endblock %}
